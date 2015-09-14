@@ -38,8 +38,6 @@ var path         = require('path');
 var Promise      = require('bluebird');
 var utils        = require('../lib/utils');
 
-console.log(Promise.promisify);
-console.log(utils.execute);
 var executeP = Promise.promisify(utils.execute);
 
 /**
