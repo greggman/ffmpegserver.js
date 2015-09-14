@@ -1,0 +1,36 @@
+{
+  "name": "canvas-to-video",
+  "version": "0.0.1",
+  "description": "Simple Lib+Server for encoding canvas frames as video",
+  "main": "start.js",
+  "scripts": {
+    "test": "node node_modules/mocha/bin/mocha --recursive",
+    "start": "node start.js --app-mode"
+  },
+  "keywords": [
+    "video",
+    "canvas",
+    "encode",
+    "encoder",
+    "encoding",
+    "webgl"
+  ],
+  "author": "Gregg Tavares",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^2.10.0",
+    "busboy": "^0.2.11",
+    "debug": "^2.2.0",
+    "express": "^4.13.3",
+    "ffmpeg-static": "^1.0.0",
+    "optionator": "^0.6.0",
+    "tmp": "0.0.27",
+    "ws": "^0.8.0"
+  },
+  "devDependencies": {
+    "mocha": "^2.3.2",
+    "request": "^2.61.0",
+    "requirejs": "^2.1.20",
+    "should": "^7.1.0"
+  }
+}
