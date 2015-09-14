@@ -86,6 +86,7 @@ describe('video-encode', function() {
 
 
   it('should be able submit frames', function(done) {
+    this.timeout(5000);
     var testFrameEncoder = new TestFrameEncoder({server: server});
     var frameEncoder = testFrameEncoder.getFrameEncoder();
     var frames = [];
@@ -394,7 +395,7 @@ describe('video-encode', function() {
       server.close();
     }
     if (videoDir) {
-//      deleteFiles(videoDir, [".mp4"]);
+      deleteFiles(videoDir, [".mp4"]);
     }
     if (frameDir) {
       deleteFiles(frameDir, [".png"]);
