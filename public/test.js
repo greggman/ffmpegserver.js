@@ -32,7 +32,7 @@
   "use strict";
 
   var framesPerSecond = 60;
-  var numFrames = 20; //1000;  // framesPerSecond * 60 * 2;
+  var numFrames = 20; //framesPerSecond * 60 * 2;
   var thickness = 100;
   var speed = 4;
   var frameNum = 0;
@@ -71,8 +71,8 @@
     verbose: false,
     framerate: framesPerSecond,
     onProgress: onProgress,
-    extension: ".flv",
-    codec: "flv1",
+    //extension: ".mp4",
+    //codec: "libx264",
   } );
   capturer.start();
 
