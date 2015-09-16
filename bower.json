@@ -1,0 +1,34 @@
+{
+  "name": "ffmpegserver.js",
+  "version": "0.0.0",
+  "homepage": "https://github.com/greggman/ffmpegserver.js",
+  "authors": [
+    "Gregg Tavares <github@greggman.com>"
+  ],
+  "description": "Send canvas frames to server and run ffmpeg on them. Compatible with CCapture.js",
+  "main": "dist/ffmpegserver.min.js",
+  "moduleType": [
+    "amd",
+    "globals"
+  ],
+  "keywords": [
+    "canvas",
+    "webgl",
+    "video",
+    "ffmpeg"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "build",
+    "public",
+    "src",
+    "server",
+    "output",
+    "lib",
+    "test",
+    "tests"
+  ]
+}

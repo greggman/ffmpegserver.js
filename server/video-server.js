@@ -31,13 +31,16 @@
 
 'use strict';
 
-var debug                     = require('debug')('hft-server');
-var events                    = require('events');
-var express                   = require('express');
-var fs                        = require('fs');
-var http                      = require('http');
-var path                      = require('path');
-var url                       = require('url');
+var debug   = require('debug')('video-server');
+var events  = require('events');
+var express = require('express');
+var fs      = require('fs');
+var http    = require('http');
+var path    = require('path');
+var Promise = require('bluebird');
+var url     = require('url');
+
+var statP = Promise.promisify(fs.stat);
 
 /**
  * @param {VideoServer~Options} options
@@ -51,6 +54,7 @@ var VideoServer = function(options, startedCallback) {
     port: 8080,
     baseDir: 'public',
     cwd: process.cwd(),
+    files: {},
   };
 
   Object.keys(options).forEach(function(prop) {
@@ -71,13 +75,32 @@ var VideoServer = function(options, startedCallback) {
     res.end('{}');
   };
 
+  var handleDownload = function(req, res) {
+    var fileId = req.params[0];
+    var fileInfo = g.files[fileId];
+    if (!fileInfo) {
+      debug("no such fileId: " + fileId);
+      return res.status(404).send('no file: ' + fileId);
+    }
+    debug("download: " + fileInfo.path);
+    setTimeout(function() {
+      res.sendFile(fileInfo.path);
+    }, 1);
+  };
+
 //  app.use(/^\/api\/v0\/uploadFile\//, busboy());
 //  app.post(/^\/api\/v0\/uploadFile\//, addUploadedFile);
 //  app.post(/.*/, bodyParser);
-  app.get('^/frameencoder/frameencoder.js', function(req, res) {
-    res.end("frameencoder");
-  });
+//  app.get(/^\/frameencoder\/frameencoder\.js$/, function(req, res) {
+//    debug("send frameencoder");
+//    res.end("frameencoder");
+//  });
+  app.get(/^\/frameencoder\/downloads\/(.*?)$/, handleDownload);
   app.options(/.*/, handleOPTIONS);
+  app.get('/fuckme', function(req,res) {
+    res.send("fuckme");
+  });
+  app.use('/ffmpegserver', express.static(path.join(__dirname, '..', 'dist')));
   app.use(express.static(g.baseDir));
 
   function serverErrorHandler() {
@@ -85,7 +108,7 @@ var VideoServer = function(options, startedCallback) {
     tryToStartServer();
   };
 
-  var server = options.httpServer || http.createServer(app);
+  var server = options.httpServerFactory ? options.httpServerFactory(app) : http.createServer(app);
   var socketServer;
 
   function serverListeningHandler() {
@@ -94,8 +117,11 @@ var VideoServer = function(options, startedCallback) {
       videoDir: options.videoDir,
       frameDir: options.frameDir,
     });
+    socketServer.setVideoServer(self);
     console.log("Listening on port:", g.port);
-    startedCallback();
+    if (startedCallback) {
+      startedCallback();
+    }
   };
 
   function tryToStartServer() {
@@ -127,8 +153,30 @@ var VideoServer = function(options, startedCallback) {
     eventEmitter.removeListener.apply(eventEmitter, arguments);
   };
 
-  this.handleRequest = function(req, res) {
-    app(req, res);
+//  this.handleRequest = function(req, res) {
+//    app(req, res);
+//  };
+  this.getServer = function() {
+    return server;
+  };
+
+  this.addFile = function(filename) {
+    var basename = path.basename(filename);
+    var pathname = "/frameencoder/downloads/" + basename;
+    g.files[basename] = {
+      path: filename,
+    };
+    return statP(filename)
+    .then(function(stat) {
+      return {
+        pathname: pathname,
+        size: stat.size,
+      };
+    })
+    .catch(function(e) {
+      console.error(e);
+      throw e;
+    });
   };
 };
 

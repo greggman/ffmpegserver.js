@@ -31,6 +31,8 @@
 
 'use strict';
 
+var path = require('path');
+
 var optionSpec = {
   options: [
     { option: 'help', alias: 'h', type: 'Boolean',  description: 'displays help'},
@@ -67,6 +69,8 @@ if (args.help) {
 
 function startServer() {
   var VideoServer = require('./video-server');
+  args.videoDir = path.join(process.cwd(), args.videoDir);
+  args.frameDir = path.join(process.cwd(), args.frameDir);
   var server = new VideoServer(args);
 }
 

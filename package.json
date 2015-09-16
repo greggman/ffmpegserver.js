@@ -1,11 +1,11 @@
 {
-  "name": "canvas-to-video",
+  "name": "ffmpegserver.js",
   "version": "0.0.1",
-  "description": "Simple Lib+Server for encoding canvas frames as video",
+  "description": "Server for encoding canvas frames as video",
   "main": "start.js",
   "scripts": {
     "test": "node node_modules/mocha/bin/mocha --recursive",
-    "start": "node start.js --app-mode"
+    "start": "node start.js"
   },
   "keywords": [
     "video",
@@ -28,9 +28,23 @@
     "ws": "^0.8.0"
   },
   "devDependencies": {
+    "almond": "^0.3.1",
+    "eslint": "^0.18.0",
+    "eslint-plugin-google-camelcase": "0.0.1",
+    "eslint-plugin-html": "git+https://github.com/greggman/eslint-plugin-html.git#fix-space-eating",
+    "eslint-plugin-one-variable-per-var": "0.0.3",
+    "eslint-plugin-optional-comma-spacing": "0.0.4",
+    "eslint-plugin-require-trailing-comma": "0.0.1",
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-requirejs": "^0.4.4",
+    "grunt-contrib-uglify": "^0.9.1",
+    "gruntify-eslint": "^1.0.1",
     "mocha": "^2.3.2",
     "request": "^2.61.0",
     "requirejs": "^2.1.20",
-    "should": "^7.1.0"
+    "semver": "^4.3.4",
+    "should": "^7.1.0",
+    "supertest": "^1.1.0"
   }
 }

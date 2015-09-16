@@ -32,42 +32,116 @@
 "use strict";
 
 var debug        = require('debug')('video-encoder');
-var ffmpeg       = require('ffmpeg-static');
+var FFMpegRunner = require('../lib/ffmpeg-runner');
 var fs           = require('fs');
 var path         = require('path');
 var Promise      = require('bluebird');
 var utils        = require('../lib/utils');
-
-var executeP = Promise.promisify(utils.execute);
 
 /**
  * @constructor
  * @param {!Client} client The websocket
  * @param {string} id a unique id
  */
-function VideoEncoder(client, id, options) {
+function VideoEncoder(client, server, id, options) {
   var count = 0;
   var name;
   var frames = [];
   var sendCmd;
+  var numWriting = 0;
+  var numErrors = 0;
+  var ended = false;
+  var framerate = 30;
+  var extension = ".mp4";
+  var codec;
 
   debug("" + id + ": start encoder");
 
   function safeName(name) {
-    return name.substr(0, 30).replace(/[^0-9a-zA-Z-]/g, '_');
+    return name.substr(0, 30).replace(/[^0-9a-zA-Z-.]/g, '_');
   }
 
   var handleStart = function(data) {
+    if (name !== undefined) {
+      return sendCmd("error", "video already in progress");
+    }
     data = data || {};
+    framerate = data.framerate || 30;
+    extension = safeName(data.extension || ".mp4");
+    codec = data.codec;
+
 // TODO: check it's not started
     count = 0;
+    numErrors = 0;
+    ended = false;
     name = safeName((data.name || "untitled") + "-" + id);
     frames = [];
     debug("start: " + name);
   };
 
+  var cleanup = function() {
+    frames.forEach(utils.deleteNoFail.bind(utils));
+    frames = [];
+  };
+
+  var checkForEnd = function() {
+    if (ended && numWriting === 0) {
+      var videoname = path.join(options.videoDir, name + extension);
+      var framesname = path.join(options.frameDir, name + "-%d.png");
+      console.log("converting " + framesname + " to " + videoname);
+      var args = [
+        "-framerate", framerate,
+        "-pattern_type", "sequence",
+        "-start_number", "0",
+        "-i", framesname,
+        "-y",
+      ];
+
+      if (codec) {
+        args.push("-c:v", codec);
+      }
+      args.push(videoname)
+
+
+      var handleFFMpegError = function(result) {
+        debug("error running ffmpeg: " + JSON.stringify(result));
+        sendCmd("error", { result: result });
+        cleanup();
+        name = undefined;
+      };
+
+      var handleFFMpegDone = function(result) {
+        console.log("converted frames to: " + videoname);
+        server.addFile(videoname)
+        .then(function(fileInfo) {
+          sendCmd("end", fileInfo);
+          cleanup();
+          name = undefined;
+        })
+        .catch(function(e) {
+          console.log("error adding file: " + videoname);
+          throw e;
+        });
+      };
+
+      var handleFFMpegFrame = function(frameNum) {
+        sendCmd("progress", {
+          progress: frameNum / frames.length,
+        });
+      };
+
+      var runner = new FFMpegRunner(args);
+      runner.on('error', handleFFMpegError);
+      runner.on('done', handleFFMpegDone);
+      runner.on('frame', handleFFMpegFrame);
+    }
+  }
+
   var EXPECTED_HEADER = 'data:image/png;base64,';
   var handleFrame = function(data) {
+    if (name === undefined) {
+      return sendCmd("error", "video not started");
+    }
     var dataURL = data.dataURL;
     if (dataURL.substr(0, EXPECTED_HEADER.length) !== EXPECTED_HEADER) {
       console.error("bad data URL");
@@ -77,38 +151,29 @@ function VideoEncoder(client, id, options) {
     var filename = path.join(options.frameDir, name + "-" + frameNum + ".png");
     debug("write: " + filename);
     var image = dataURL.substr(EXPECTED_HEADER.length);
+    ++numWriting;
     fs.writeFile(filename, image, 'base64', function(err) {
+      --numWriting;
       if (err) {
+        ++numErrors;
         console.error(err);
       } else {
         frames.push(filename);
         sendCmd("frame", { frameNum: frameNum })
-        console.log('Saved Screenshot: ' + filename);
+        console.log('saved frame: ' + filename);
+      }
+      if (numWriting === 0) {
+        checkForEnd();
       }
     });
   };
 
   var handleEnd = function(data) {
-    var videoname = path.join(options.videoDir, name + ".mp4");
-    var framesname = path.join(options.frameDir, name + "-%d.png");
-    console.log("converting " + framesname + " to " + videoname);
-    var args = [
-      "-framerate", "30",
-      "-pattern_type", "sequence",
-      "-start_number", "0",
-      "-i", framesname,
-      "-vcodec",
-      "mpeg4",
-      videoname,
-    ];
-    executeP(ffmpeg.path, args)
-    .then(function(result) {
-      console.log("converted frames to: " + videoname);
-      sendCmd("end", { name: name });
-// Delete frames!
-    })
-    .catch(function(result) {
-    })
+    if (name === undefined) {
+      return sendCmd("error", "video not started");
+    }
+    ended = true;
+    checkForEnd();
   };
 
   var messageHandlers = {
@@ -132,6 +197,7 @@ function VideoEncoder(client, id, options) {
    * Disconnect this player. Drop their WebSocket connection.
    */
   var disconnect = function() {
+    cleanup();
     client.on('message', undefined);
     client.on('disconnect', undefined);
     client.close();
@@ -142,6 +208,8 @@ function VideoEncoder(client, id, options) {
    * @param {object} msg data to send.
    */
   var send = function(msg) {
+    //debug("send:" + JSON.stringify(msg));
+    //debug((new Error()).stack);
     try {
       client.send(msg);
     } catch (e) {
@@ -163,8 +231,7 @@ function VideoEncoder(client, id, options) {
 
   client.on('message', onMessage);
   client.on('disconnect', onDisconnect);
-
-
+  sendCmd("start", {});
 };
 
 
