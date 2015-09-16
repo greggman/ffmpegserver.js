@@ -695,7 +695,7 @@ define('src/frameencoder.js',[
       }
     };
 
-    _socket = options.socket || new VirtualSocket();
+    _socket = options.socket || new VirtualSocket(options);
     _socket.on('connect', connected_.bind(this));  // eslint-disable-line
     _socket.on('message', processMessage_.bind(this));
     _socket.on('disconnect', disconnected_.bind(this));  // eslint-disable-line
@@ -753,7 +753,10 @@ define('src/ffmpegserver',[
 
   function FFMpegServer( settings ) {
 
-    var _frameEncoder = new FrameEncoder();
+    settings = settings || {};
+    settings.url = settings.url || getWebSocketURL();
+
+    var _frameEncoder = new FrameEncoder(settings);
     var _highestFrameSubmitted = 0;
     var _highestFrameAcknowledged = 0;
     var _maxQueuedFrames = settings.maxQueuedFrames || 4;
@@ -762,19 +765,40 @@ define('src/ffmpegserver',[
     var _handlers = {};
     var _settings;
 
-    var FakeFrameEncoder = function() {
-      var _handlers = {};
-      this.start = noop;
-      this.add = noop;
-      this.end = noop;
-      this.on = function(e, f) {
-        _handlers[e] = f;
+  // var FakeFrameEncoder = function() {
+  //   var _handlers = {};
+  //   this.start = noop;
+  //   this.add = noop;
+  //   this.end = noop;
+  //   this.on = function(e, f) {
+  //     _handlers[e] = f;
+  //   };
+  //   setTimeout(function() {
+  //     _handlers.start();
+  //   }, 2);
+  // };
+  // frameEncoder = new FakeFrameEncoder();
+
+    function getWebSocketURL() {
+      var scriptNames = {
+        "ffmpegserver.js": true,
+        "ffmpegserver.min.js": true,
       };
-      setTimeout(function() {
-        _handlers.start();
-      }, 2);
-    };
-  //  frameEncoder = new FakeFrameEncoder();
+      var scripts = document.getElementsByTagName("script");
+      for (var ii = 0; ii < scripts.length; ++ii) {
+        var script = scripts[ii];
+        var scriptName = script.src;
+        var slashNdx = scriptName.lastIndexOf("/");
+        if (slashNdx >= 0) {
+          scriptName = scriptName.substr(slashNdx + 1);
+        }
+        if (scriptNames[scriptName]) {
+          var u = new URL(script.src);
+          var url = "ws://" + u.host;
+          return url;
+        }
+      }
+    }
 
     this.start = function( settings ) {
       _settings = settings || {};
