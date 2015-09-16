@@ -38,12 +38,32 @@ var path         = require('path');
 var Promise      = require('bluebird');
 var utils        = require('../lib/utils');
 
+var encoders = [];
+
+function cleanUpEncodersOnExit() {
+  encoders.forEach(function(encoder, ndx) {
+    console.log(ndx);
+    encoder.cleanup();
+  });
+  encoders = [];
+};
+
+function cleanUpEncodersOnExitAndExit() {
+  cleanUpEncodersOnExit();
+  process.exit();
+}
+
+process.on('exit', cleanUpEncodersOnExit);
+process.on('SIGINT', cleanUpEncodersOnExitAndExit);
+process.on('uncaughtException', cleanUpEncodersOnExitAndExit);
+
 /**
  * @constructor
  * @param {!Client} client The websocket
  * @param {string} id a unique id
  */
 function VideoEncoder(client, server, id, options) {
+  var self = this;
   var count = 0;
   var name;
   var frames = [];
@@ -54,6 +74,9 @@ function VideoEncoder(client, server, id, options) {
   var framerate = 30;
   var extension = ".mp4";
   var codec;
+  var connected = true;
+
+  encoders.push(this);
 
   debug("" + id + ": start encoder");
 
@@ -80,8 +103,11 @@ function VideoEncoder(client, server, id, options) {
   };
 
   var cleanup = function() {
-    frames.forEach(utils.deleteNoFail.bind(utils));
-    frames = [];
+    if (frames.length) {
+      console.log("deleting frames for: " + name);
+      frames.forEach(utils.deleteNoFail.bind(utils));
+      frames = [];
+    }
   };
 
   var checkForEnd = function() {
@@ -158,6 +184,10 @@ function VideoEncoder(client, server, id, options) {
         ++numErrors;
         console.error(err);
       } else {
+        if (!connected) {
+          utils.deleteNoFail(filename);
+          return;
+        }
         frames.push(filename);
         sendCmd("frame", { frameNum: frameNum })
         console.log('saved frame: ' + filename);
@@ -197,10 +227,17 @@ function VideoEncoder(client, server, id, options) {
    * Disconnect this player. Drop their WebSocket connection.
    */
   var disconnect = function() {
+    connected = false;
+    var ndx = encoders.indexOf(self);
+    encoders.splice(ndx, 1);
     cleanup();
     client.on('message', undefined);
     client.on('disconnect', undefined);
-    client.close();
+    client.on('error', undefined);
+    try {
+      client.close();
+    } catch(e) {
+    }
   };
 
   /**
@@ -229,9 +266,17 @@ function VideoEncoder(client, server, id, options) {
     disconnect();
   };
 
+  var onError = function(e) {
+    console.error(e);
+    disconnect();
+  };
+
   client.on('message', onMessage);
   client.on('disconnect', onDisconnect);
+  client.on('error', onError);
   sendCmd("start", {});
+
+  this.cleanup = cleanup;
 };
 
 
