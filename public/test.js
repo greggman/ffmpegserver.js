@@ -51,7 +51,7 @@
   }
 
   function showVideoLink(url, size) {
-    size = size || "unknown size";
+    size = size ? (" [size: " + (size / 1024 / 1024).toFixed(1) + "meg]") : " [unknown size]";
     var a = document.createElement("a");
     a.href = url;
     var filename = url;
@@ -60,7 +60,7 @@
       filename = filename.substr(slashNdx + 1);
     }
     a.download = filename;
-    a.appendChild(document.createTextNode(url + " [" + size + "]"));
+    a.appendChild(document.createTextNode(url + size));
     document.body.appendChild(a);
   }
 
