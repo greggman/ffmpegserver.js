@@ -104,9 +104,11 @@ function VideoEncoder(client, server, id, options) {
 
   var cleanup = function() {
     if (frames.length) {
-      console.log("deleting frames for: " + name);
-      frames.forEach(utils.deleteNoFail.bind(utils));
-      frames = [];
+      if (!options.keepFrames) {
+        console.log("deleting frames for: " + name);
+        frames.forEach(utils.deleteNoFail.bind(utils));
+        frames = [];
+      }
     }
   };
 

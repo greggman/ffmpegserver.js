@@ -63,6 +63,7 @@ var SocketServer = function(server, options) {
       return new VideoEncoder(client, videoServer, ++nextSessionId, {
         videoDir: options.videoDir,
         frameDir: options.frameDir,
+        keepFrames: options.keepFrames,
       });
   }.bind(this));
 

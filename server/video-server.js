@@ -116,6 +116,7 @@ var VideoServer = function(options, startedCallback) {
     socketServer = options.socketServer || new SocketServer(server, {
       videoDir: options.videoDir,
       frameDir: options.frameDir,
+      keepFrames: options.keepFrames,
     });
     socketServer.setVideoServer(self);
     console.log("Listening on port:", g.port);
