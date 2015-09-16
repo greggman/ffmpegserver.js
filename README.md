@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/greggman/ffmpegserver.js.svg?branch=master)](https://travis-ci.org/greggman/ffmpegserver.js)
 
 This is a simple node server and library that sends canvas frames to the server and uses ffmpeg to compress the video.
-It can be used standalone or with CCapture.js [CCapture.js](https://github.com/spite/ccapture.js).
+It can be used standalone or with [CCapture.js](https://github.com/spite/ccapture.js).
 
 ## Setup
 
@@ -91,24 +91,25 @@ as in
 
     node start.js --frame-dir=/tmp --video-dir=~/videos
 
-The frames are deleted after the video is created default. Top stop frames
+The frames are deleted after the video is created by default. Top stop frames
 from being deleted use
 
     --keep-frames
 
 ## Serving your files
 
-You have 2 options to serve your files
+You have 2 options to serve your files for your canvas app
 
 1.  Server them from somewhere else.
 
-    Maybe you have your files on `mysite.com`. As long as the 2 scripts
+    Maybe you have your files on `mysite.com` or wherever. As long as the 2 scripts
     above are included from localhost like this
 
-        <script src="http://localhost:8080/CCapture.min.js"></script>
+        <script src="http://localhost:8080/ffmpegserver/CCapture.min.js"></script>
         <script src="http://localhost:8080/ffmpegserver/ffmpegserver.js"></script>
 
-    It should work.
+    It should work. Just those 2 scripts will be served by ffmpegserver, the rest
+    by whatever serve you normally use.
 
     You might want to you to check for the existence of CCapture.min.js
     For example:
