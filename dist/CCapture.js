@@ -267,7 +267,7 @@ function CCapture( settings ) {
     var _encoders = {
       gif: CCGIFEncoder,
       webm: CCWebMEncoder,
-      ffmpegserver: CCFFMpegServerEncoder,
+      ffmpegserver: CCFFMpegServerEncoder
     };
 
     var ctor = _encoders[ _settings.format ];
@@ -355,21 +355,19 @@ function CCapture( settings ) {
 	
 		if( _capturing ) {
 			_encoder.add( canvas );
-//            _queueCheck();  // why is this here?
 		}
 		
 	}
 	
 	function _process() {
 
-        _queued = false;
-
-		if ( !_encoder.safeToProceed() ) {
+		if ( !_queued || !_encoder.safeToProceed() ) {
 
 			return;
 
 		}
 	
+        _queued = false;
 		_time += _settings.step;
 		_frameCount++;
 		_log( 'Frame: ' + _frameCount );
@@ -428,7 +426,7 @@ function CCapture( settings ) {
 		capture: _capture,
 		stop: _stop,
 		save: _save,
-        on: _on,
+        on: _on
 	}
 }
 
