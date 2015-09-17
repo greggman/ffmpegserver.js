@@ -14,8 +14,9 @@ It can be used standalone or with [CCapture.js](https://github.com/spite/ccaptur
 
 The server is now running.
 
-To see it in work, go to "http://localhost:8080/test". You should see 20 frames rendered, then a link will
-be provided to download the video. Or you can get the video in the `output` folder.
+To see it in work, go to "http://localhost:8080/test.html". You should see some frames rendered, then a link will
+be provided to download the video. Or you can get the video in the `output` folder. There's a three.js sample in
+"http://localhost:8080/test2.html".
 
 ## Use it in your own code
 
@@ -65,7 +66,8 @@ requestAnimationFrame(render);
 ```
 
 That's all. Once you're done with the animation, you can call .stop and then .save().
-That will compose the video and return a URL that can be previewed or downloaded.
+That will compose the video and return a URL that can be previewed or downloaded or
+it will be available in the "output" folder.
 
 ```js
 capturer.stop();
@@ -92,12 +94,13 @@ as in
 
     node start.js --frame-dir=/tmp --video-dir=~/videos
 
-The frames are deleted after the video is created by default. Top stop frames
-from being deleted use
+The frames are deleted after the video is created by default. If you want to keep
+the frames, like say you want to use them in Final Cut Pro or After Effects then
+use
 
-    --keep-frames
+    node start.js --keep-frames
 
-## Serving your files
+## Serving your project files
 
 You have 2 options to serve your files for your canvas app
 
@@ -110,7 +113,7 @@ You have 2 options to serve your files for your canvas app
         <script src="http://localhost:8080/ffmpegserver/ffmpegserver.js"></script>
 
     It should work. Just those 2 scripts will be served by ffmpegserver, the rest
-    by whatever serve you normally use.
+    by whatever server you normally use.
 
     You might want to you to check for the existence of CCapture.min.js
     For example:
@@ -127,6 +130,7 @@ You have 2 options to serve your files for your canvas app
 
         node start.js --base-dir=path/to/files
 
+    the default is the `"public"` folder in the ffmpegserver.js folder.
 
 ## To Do
 
