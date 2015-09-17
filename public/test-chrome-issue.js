@@ -123,7 +123,12 @@
 
     ctx.restore();
 
-    capturer.capture(canvas);
+    if (frameNum < 200) {
+      capturer.capture(canvas);
+    } else {
+      var s = canvas.toDataURL();
+      var y = JSON.stringify(s);
+    }
 
     ++frameNum;
     if (frameNum === numFrames) {

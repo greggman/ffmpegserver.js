@@ -570,9 +570,24 @@ define('src/virtualsocket',[],function() {
       }
     };
 
+    var sentSoFar = 0;
+    var msgCount = 0;
+
     this.send = function(msg) {
-      sendLowLevel(JSON.stringify(msg));
+      var msg = JSON.stringify(msg);
+      sendLowLevel(msg);
+      sentSoFar += msg.length;
+      ++msgCount;
     };
+
+    var d = window.Date.now;
+    var then = d() * 0.001;
+    setInterval(function() {
+      var now = d() * 0.001;
+      var elapsedTime = now - then;
+      console.log("sec elapsed: " + elapsedTime.toFixed(0) + " msgCount: " + msgCount + ": sentByJS: " + sentSoFar + " bufferedAmount: " + _socket.bufferedAmount);
+    }, 1000);
+
 
     this.close = function() {
      _socket.close();
