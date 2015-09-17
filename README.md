@@ -35,6 +35,7 @@ You can tweak the object by setting parameters on the constructor:
 
 ```js
 var capturer = new CCapture( {
+    format: 'ffmpegserver',
     framerate: 60,
     verbose: true,
     name: "foobar",     // videos will be named foobar-#.mp4, untitled if not set.
