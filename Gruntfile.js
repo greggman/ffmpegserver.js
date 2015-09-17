@@ -142,7 +142,10 @@ module.exports = function(grunt) {
       },
     },
     clean: {
-      dist: [ 'dist' ],
+      dist: [
+        'dist/ffmpegserver.js',
+        'dist/ffmpegserver.min.js',
+      ],
     },
   });
 
