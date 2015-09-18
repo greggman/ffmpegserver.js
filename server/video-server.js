@@ -97,9 +97,6 @@ var VideoServer = function(options, startedCallback) {
 //  });
   app.get(/^\/frameencoder\/downloads\/(.*?)$/, handleDownload);
   app.options(/.*/, handleOPTIONS);
-  app.get('/fuckme', function(req,res) {
-    res.send("fuckme");
-  });
   app.use('/ffmpegserver', express.static(path.join(__dirname, '..', 'dist')));
   app.use(express.static(g.baseDir));
 
