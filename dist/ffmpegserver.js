@@ -614,7 +614,7 @@ define('src/virtualsocket',[],function() {
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-define('src/frameencoder.js',[
+define('src/frameencoder',[
     './virtualsocket',
   ], function(
      VirtualSocket) {
@@ -744,7 +744,7 @@ define('src/frameencoder.js',[
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 define('src/ffmpegserver',[
-    './frameencoder.js',
+    './frameencoder',
   ], function(
      FrameEncoder
   ) {
