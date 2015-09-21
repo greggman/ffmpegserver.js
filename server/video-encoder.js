@@ -76,8 +76,6 @@ function VideoEncoder(client, server, id, options) {
   var codec;
   var connected = true;
 
-  encoders.push(this);
-
   debug("" + id + ": start encoder");
 
   function safeName(name) {
@@ -279,6 +277,8 @@ function VideoEncoder(client, server, id, options) {
   sendCmd("start", {});
 
   this.cleanup = cleanup;
+  encoders.push(this);
+
 };
 
 
