@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 define([
-    './frameencoder.js',
+    './frameencoder',
   ], function(
      FrameEncoder
   ) {
