@@ -92,7 +92,12 @@ function VideoEncoder(client, server, id, options) {
     framerate = data.framerate || 30;
     extension = safeName(data.extension || ".mp4");
     codec = data.codec;
-    ffmpegArguments = data.ffmpegArguments;
+    if (options.allowArbitraryFfmpegArguments) {
+      ffmpegArguments = data.ffmpegArguments;
+    } else if (data.ffmpegArguments) {
+      sendCmd("error", { msg: "ffmpegArguments not allowed without --allow-arbitrary-ffmpeg-argumments command line option" });
+      return;
+    }
 
 // TODO: check it's not started
     count = 0;

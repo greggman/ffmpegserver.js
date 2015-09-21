@@ -41,6 +41,7 @@ var optionSpec = {
     { option: 'video-dir',        type: 'String',   description: 'folder to save video files to', default: 'output'},
     { option: 'frame-dir',        type: 'String',   description: 'folder to save frames to', default: 'output'},
     { option: 'keep-frames',      type: 'Boolean',  description: 'do not delete the frames after encoding'},
+    { option: 'allow-arbitrary-ffmpeg-arguments',      type: 'Boolean',  description: 'allow arbitrary ffmpeg arguments passed from browser', default: "false"},
   ],
   helpStyle: {
     typeSeparator: '=',

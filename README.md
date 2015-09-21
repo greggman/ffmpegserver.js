@@ -134,8 +134,12 @@ You have 2 options to serve your files for your canvas app
 
 ## Passing more arguments to ffmpeg
 
-ffmpeg as a bazillion options. You can pass any options you want when creating
-the `CCapture` object. Example
+ffmpeg as a bazillion options. To pass in more options to ffmpeg first run
+with
+
+    node start.js --allow-arbitrary-ffmpeg-arguments
+
+Now you can pass any options you want when creating the `CCapture` object. Example
 
     var capture = new ccapture({
       ffmpegArguments: [
@@ -143,34 +147,20 @@ the `CCapture` object. Example
       ],
     });
 
+## Security
+
+**NOTE: this code is meant to be run on your own machine for your own
+locally served canvas apps. It is not safe to use on the open internet.
+Specifically when running anyone can connect to the server and start
+uploading images. There is some security there as they can't write
+to arbitrary locations.**
+
+**Also, the ability to pass arbitrary arguments
+to ffmpeg means use input is being passed to the command line of some
+external program. That's bad. So be careful when using the
+`--allow-arbitrary-ffmpeg-arguments` option.
+
 ## To Do
-
-1.  Allow you to pass more options to ffmpeg
-
-    especially quality settings.
-
-    **NOTE:** To pass more settings to ffmpeg:
-
-    Above you call `new CCapture(options)`, all of those options are passed
-    to the server. In the file `server/video-encoder.js` in the function
-    `handleStart`. The `data` argument is the same `options` from when
-    you called `new CCapture`. Save any data you want then look for the function
-    `checkForEnd`. You'll see some code like this
-
-        var args = [
-          "-framerate", framerate,
-          "-pattern_type", "sequence",
-          "-start_number", "0",
-          "-i", framesname,
-          "-y",
-        ];
-
-    Those are the arguments being passed to ffmpeg. Add any more you need.
-
-    I suppose a simple addition would just be to add `ffmpegArguments` to
-    the options like this
-
-    var ff
 
 2.  Support giant images.
 

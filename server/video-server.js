@@ -114,6 +114,7 @@ var VideoServer = function(options, startedCallback) {
       videoDir: options.videoDir,
       frameDir: options.frameDir,
       keepFrames: options.keepFrames,
+      allowArbitraryFfmpegArguments: options.allowArbitraryFfmpegArguments,
     });
     socketServer.setVideoServer(self);
     console.log("Listening on port:", g.port);
