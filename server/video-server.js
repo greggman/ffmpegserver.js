@@ -158,6 +158,10 @@ var VideoServer = function(options, startedCallback) {
     return server;
   };
 
+  this.getApp = function() {
+    return app;
+  };
+
   this.addFile = function(filename) {
     var basename = path.basename(filename);
     var pathname = "/frameencoder/downloads/" + basename;
