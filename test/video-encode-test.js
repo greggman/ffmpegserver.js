@@ -37,7 +37,7 @@ var LoopbackClient   = require('../server/loopbackclient');
 var path             = require('path');
 var Promise          = require('bluebird');
 var should           = require('should');
-var TestFrameEncoder = require('../lib/test/test-frameencoder');
+var TestFFMpegServer = require('../lib/test/test-ffmpegserver');
 var testFrames       = require('../lib/test/test-frames');
 var testUtils        = require('../lib/test/test-utils');
 var utils            = require('../lib/utils');
@@ -51,6 +51,18 @@ var makeServer = function(options) {
     });
   });
 };
+
+//var events = require('events');
+//
+//events.EventEmitter.prototype.emit = function(oldOn) {
+//  return function(a) {
+//    console.log("EVENT:", a);
+//    console.log((new Error()).stack);
+//    oldOn.apply(this, arguments);
+//  }
+//}(events.EventEmitter.prototype.emit);
+
+
 
 describe('video-encode', function() {
 
@@ -83,73 +95,75 @@ describe('video-encode', function() {
 
   it('responds to lib request', function(done) {
     server.getP("http://localhost:0/ffmpegserver/ffmpegserver.min.js").then(function(res) {
-      res.body.indexOf("FFMpegServer").should.not.be.lessThan(0);
+      var expected = fs.readFileSync(path.join(__dirname, "..", "dist", "ffmpegserver.min.js"), {encoding: "utf-8"});
+      res.body.should.be.equal(expected);
     }).then(done, done);
   });
 
-//  it('should be able submit frames', function(done) {
-//    this.timeout(5000);
-//    var testFrameEncoder = new TestFrameEncoder({server: server});
-//    var frameEncoder = testFrameEncoder.getFrameEncoder();
-//    var frames = [];
-//    var name = "test@#file";
-//    var size;
-//
-//    var recordFrame = function(data) {
-//      frames.push(data.frameNum);
-//    };
-//
-//    var handleEnd = function(data) {
-//      data.pathname.should.endWith("test__file-1.mp4");
-//      data.size.should.be.greaterThan(6000);  // was 6869
-//
-//      videoPath = data.pathname;
-//      videoSize = data.size;
-//      done();
-//    };
-//
-//    var handleError = function(data) {
-//      console.error(data);
-//      assert(false);
-//      done();
-//    };
-//
-//    var handleStart = function() {
-//      testFrames.forEach(function(dataUrl) {
-//        frameEncoder.add({
-//          toDataURL: function() {
-//            return dataUrl;
-//          },
-//        });
-//      });
-//
-//      frameEncoder.end();
-//    };
-//
-//    frameEncoder.on('start', handleStart);
-//    frameEncoder.on('frame', recordFrame);
-//    frameEncoder.on('end', handleEnd);
-//    frameEncoder.on('error', handleError);
-//
-//    frameEncoder.start({
-//      name: name,
-//    });
-//  });
-//
-//  it('can download file', function(done) {
-//    this,timeout(5000);
-//
-//    server.getP("http://localhost:0" + videoPath)
-//    .then(function(res) {
-//      res.body.length.should.equal(videoSize);
-//      testFrameEncoder.close();
-//      done();
-//    })
-//    .catch(function(e) {
-//      console.error(e);
-//      throw e;
-//    });
-//  });
+  it('should be able submit frames', function(done) {
+    this.timeout(5000);
+    var testFFMpegServer = new TestFFMpegServer({server: server});
+    var ffmpegServer = testFFMpegServer.getFFMpegServer();
+    var name = "test@#file";
+    var size;
+    var started = false;
+
+    var handleProgress = function(progress) {
+    };
+
+    var handleFinished = function(url, size) {
+      url.should.endWith("test__file-1.mp4");
+      size.should.be.greaterThan(6000);  // was 6869
+      videoPath = url;
+      videoSize = size;
+      done();
+    };
+
+    var handleError = function(data) {
+      console.error(data);
+      assert(false);
+      done();
+    };
+
+    var handleProcess = function() {
+      if (!started) {
+        started = true;
+        testFrames.forEach(function(dataUrl, ndx) {
+          console.log("sending frame: " + ndx);
+          ffmpegServer.add({
+            toDataURL: function() {
+              return dataUrl;
+            },
+          });
+        });
+
+        ffmpegServer.end();
+      }
+    };
+
+    ffmpegServer.on('process', handleProcess);
+    ffmpegServer.on('progress', handleProgress);
+    ffmpegServer.on('finished', handleFinished);
+    ffmpegServer.on('error', handleError);
+
+    ffmpegServer.start({
+      name: name,
+    });
+  });
+
+  it('can download file', function(done) {
+    this.timeout(5000);
+
+    server.getP("http://localhost:0" + videoPath)
+    .then(function(res) {
+      res.body.length.should.equal(videoSize);
+      done();
+    })
+    .catch(function(e) {
+      console.error(e);
+      throw e;
+    });
+  });
 
   function deleteFiles(dir, extensions) {
     if (fs.existsSync(dir)) {
