@@ -75,6 +75,7 @@ function VideoEncoder(client, server, id, options) {
   var extension = ".mp4";
   var codec;
   var connected = true;
+  var ffmpegArguments;
 
   debug("" + id + ": start encoder");
 
@@ -83,6 +84,7 @@ function VideoEncoder(client, server, id, options) {
   }
 
   var handleStart = function(data) {
+    debug("start: " + JSON.stringify(data, null, 2));
     if (name !== undefined) {
       return sendCmd("error", "video already in progress");
     }
@@ -90,6 +92,7 @@ function VideoEncoder(client, server, id, options) {
     framerate = data.framerate || 30;
     extension = safeName(data.extension || ".mp4");
     codec = data.codec;
+    ffmpegArguments = data.ffmpegArguments;
 
 // TODO: check it's not started
     count = 0;
@@ -115,17 +118,25 @@ function VideoEncoder(client, server, id, options) {
       var videoname = path.join(options.videoDir, name + extension);
       var framesname = path.join(options.frameDir, name + "-%d.png");
       console.log("converting " + framesname + " to " + videoname);
-      var args = [
+
+      var args = [];
+
+      args = args.concat([
         "-framerate", framerate,
         "-pattern_type", "sequence",
         "-start_number", "0",
         "-i", framesname,
         "-y",
-      ];
+      ]);
 
       if (codec) {
         args.push("-c:v", codec);
       }
+
+      if (Array.isArray(ffmpegArguments)) {
+        args = args.concat(ffmpegArguments);
+      }
+
       args.push(videoname)
 
 

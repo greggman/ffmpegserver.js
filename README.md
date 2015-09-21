@@ -132,11 +132,45 @@ You have 2 options to serve your files for your canvas app
 
     the default is the `"public"` folder in the ffmpegserver.js folder.
 
+## Passing more arguments to ffmpeg
+
+ffmpeg as a bazillion options. You can pass any options you want when creating
+the `CCapture` object. Example
+
+    var capture = new ccapture({
+      ffmpegArguments: [
+        "-b:v", "100k",  // set bitrate for video to 100k per second
+      ],
+    });
+
 ## To Do
 
 1.  Allow you to pass more options to ffmpeg
 
     especially quality settings.
+
+    **NOTE:** To pass more settings to ffmpeg:
+
+    Above you call `new CCapture(options)`, all of those options are passed
+    to the server. In the file `server/video-encoder.js` in the function
+    `handleStart`. The `data` argument is the same `options` from when
+    you called `new CCapture`. Save any data you want then look for the function
+    `checkForEnd`. You'll see some code like this
+
+        var args = [
+          "-framerate", framerate,
+          "-pattern_type", "sequence",
+          "-start_number", "0",
+          "-i", framesname,
+          "-y",
+        ];
+
+    Those are the arguments being passed to ffmpeg. Add any more you need.
+
+    I suppose a simple addition would just be to add `ffmpegArguments` to
+    the options like this
+
+    var ff
 
 2.  Support giant images.
 
