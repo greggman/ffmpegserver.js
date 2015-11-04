@@ -136,12 +136,13 @@ function VideoEncoder(client, server, id, options) {
 
       if (codec) {
         args.push("-c:v", codec);
+      } else if (extension === ".mp4") {
+        args.push("-c:v", "libx264", "-pix_fmt", "yuv420p");
       }
 
       if (Array.isArray(ffmpegArguments)) {
         args = args.concat(ffmpegArguments);
       }
-
       args.push(videoname)
 
 
