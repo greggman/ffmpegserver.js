@@ -25,7 +25,7 @@
     "ffmpeg-static": "^1.0.0",
     "optionator": "^0.6.0",
     "tmp": "0.0.27",
-    "ws": "git@github.com:websockets/ws.git#7d071120333b8fa8d76d91e08884f81d97a441d0"
+    "ws": "git+https://github.com/websockets/ws.git#7d071120333b8fa8d76d91e08884f81d97a441d0"
   },
   "devDependencies": {
     "almond": "^0.3.1",
