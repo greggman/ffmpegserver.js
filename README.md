@@ -104,18 +104,18 @@ use
 
 You have 2 options to serve your files for your canvas app
 
-1.  Server them from somewhere else.
+1.  Serve them from somewhere else.
 
     Maybe you have your files on `mysite.com` or wherever. As long as the 2 scripts
     above are included from localhost like this
 
-        <script src="http://localhost:8080/ffmpegserver/CCapture.min.js"></script>
+        <script src="http://localhost:8080/ffmpegserver/CCapture.js"></script>
         <script src="http://localhost:8080/ffmpegserver/ffmpegserver.js"></script>
 
     It should work. Just those 2 scripts will be served by ffmpegserver, the rest
     by whatever server you normally use.
 
-    You might want to you to check for the existence of CCapture.min.js
+    You might want to you to check for the existence of CCapture.js
     For example:
 
         if (CCapture) {
@@ -134,7 +134,7 @@ You have 2 options to serve your files for your canvas app
 
 ## Passing more arguments to ffmpeg
 
-ffmpeg as a bazillion options. To pass in more options to ffmpeg first run
+ffmpeg has a bazillion options. To pass in more options to ffmpeg first run
 with
 
     node start.js --allow-arbitrary-ffmpeg-arguments
