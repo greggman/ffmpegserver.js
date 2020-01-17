@@ -73,6 +73,7 @@
     onProgress: onProgress,
     //extension: ".mp4",
     //codec: "libx264",
+    name: "10-20x30",
   } );
   capturer.start();
 

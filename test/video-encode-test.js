@@ -35,7 +35,6 @@ var assert           = require('assert');
 var fs               = require('fs');
 var LoopbackClient   = require('../server/loopbackclient');
 var path             = require('path');
-var Promise          = require('bluebird');
 var should           = require('should');
 var TestFFMpegServer = require('../lib/test/test-ffmpegserver');
 var testFrames       = require('../lib/test/test-frames');

@@ -35,7 +35,6 @@ var debug        = require('debug')('video-encoder');
 var FFMpegRunner = require('../lib/ffmpeg-runner');
 var fs           = require('fs');
 var path         = require('path');
-var Promise      = require('bluebird');
 var utils        = require('../lib/utils');
 
 var encoders = [];

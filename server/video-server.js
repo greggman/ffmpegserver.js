@@ -37,10 +37,9 @@ var express = require('express');
 var fs      = require('fs');
 var http    = require('http');
 var path    = require('path');
-var Promise = require('bluebird');
 var url     = require('url');
 
-var statP = Promise.promisify(fs.stat);
+var statP = fs.promises.stat;
 
 /**
  * @param {VideoServer~Options} options
