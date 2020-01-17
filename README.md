@@ -5,6 +5,8 @@
 This is a simple node server and library that sends canvas frames to the server and uses ffmpeg to compress the video.
 It can be used standalone or with [CCapture.js](https://github.com/spite/ccapture.js).
 
+**NOTE: This is not for realtime capture. It is a slow process meant just be a simple way to generate a video from canvas output**.
+
 ## Setup
 
 1.  [Install nodejs](http://nodejs.org/download)
