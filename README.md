@@ -25,7 +25,7 @@ be provided to download the video. Or you can get the video in the `output` fold
 In whatever JavaScript program you want to capture from
 
 ```
-<script src="http://localhost:8080/ffmpegserver/ffmpegserver.min..js"></script>
+<script src="http://localhost:8080/ffmpegserver/ffmpegserver.min.js"></script>
 <script src="http://localhost:8080/3rdparty/CCapture.min.js"></script>
 ```
 
