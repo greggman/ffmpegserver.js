@@ -21,7 +21,7 @@
     "busboy": "^0.3.1",
     "debug": "^4.1.1",
     "express": "^4.17.1",
-    "ffmpeg-static": "^3.0.0",
+    "ffmpeg-static": "^5.0.0",
     "optionator": "^0.8.3",
     "tmp": "^0.1.0",
     "ws": "^7.2.1"
